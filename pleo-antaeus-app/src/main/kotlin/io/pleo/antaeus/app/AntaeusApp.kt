@@ -24,6 +24,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import setupInitialData
 import java.io.File
 import java.sql.Connection
+import java.time.LocalDateTime
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 fun main() {
     // The tables to create in the database.
@@ -61,7 +64,12 @@ fun main() {
     val customerService = CustomerService(dal = dal)
 
     // This is _your_ billing service to be included where you see fit
-    val billingService = BillingService(paymentProvider = paymentProvider)
+    val billingService = BillingService(paymentProvider = paymentProvider, dal = dal)
+
+    // Schedule daily check for billing activities and trigger billing at the first day of every month
+    Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(
+            if (LocalDateTime.now().dayOfMonth == 1) billingService
+            else Runnable { println("It's not the 1st day of a month yet..") }, 10, 3600 * 24, TimeUnit.SECONDS)
 
     // Create REST web service
     AntaeusRest(
