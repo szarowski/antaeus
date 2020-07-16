@@ -85,4 +85,26 @@ The code given is structured as follows. Feel free however to modify the structu
 * [Mockk](https://mockk.io/) - Mocking library
 * [Sqlite3](https://sqlite.org/index.html) - Database storage engine
 
-Happy hacking 😁!
+### Challenge Progress Log
+
+* First (probably an hour) I realised that I am not sure about the challenge goal. So this is my current status 
+of the exploration.
+
+* There is an external payment provider which should do the `charge` task but the mock in the app module is randomly 
+generating the results and no exceptions. I assumed that the external service is not the code I can change so I left the mock as is.
+
+* However, I could change the billing service as it seems to be an internal service. The code is in BillingService.kt
+  
+* The next issue to resolve was to schedule billing at the first day of every month.
+I updated it in the AntaeusApp.kt file. It is a simple thread scheduling when every day we check if it is the first day
+of the month and if so, we trigger the billing, it prints some log otherwise.
+
+* Finally it would be great to have some tests for BillingService, so I implemented them in BillingServiceTest file.
+
+It took me about 2 hours ..so far.
+
+#### Notes
+
+BillingService duplicates (intentionally) PaymentProvider exception checks and adds a check 
+to throw InvoiceNotFoundException because it is not clear to me how this external service can generate those exceptions
+without access to the Customer model (which is internal).
